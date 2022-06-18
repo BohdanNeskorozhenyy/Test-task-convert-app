@@ -9,4 +9,3 @@ export const getData = () => {
     }));
 };
 
-//https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=EUR&date=20200302&json

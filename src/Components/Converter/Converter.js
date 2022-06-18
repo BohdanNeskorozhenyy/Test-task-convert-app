@@ -9,9 +9,6 @@ import { withStyles } from '@material-ui/core/styles';
 import InputBase from '@material-ui/core/InputBase';
 import { getData } from '../../services/getData';
 
-// axios
-//   .get('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json')
-//   .then((res) => console.log(res));
 
 const BootstrapInput = withStyles((theme) => ({
   root: {
