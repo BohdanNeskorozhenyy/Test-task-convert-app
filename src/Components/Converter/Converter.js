@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+
 import styled from 'styled-components';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -5,8 +7,7 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import { withStyles } from '@material-ui/core/styles';
 import InputBase from '@material-ui/core/InputBase';
-
-import axios from 'axios';
+import { getData } from '../../services/getData';
 
 // axios
 //   .get('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json')
@@ -49,53 +50,74 @@ const BootstrapInput = withStyles((theme) => ({
 }))(InputBase);
 
 export const Converter = () => {
+  const [from, setFrom] = useState('USD');
+  const [to, setTo] = useState('UAH');
+  const [data, setData] = useState({});
+  const [fromInput, setFromInput] = useState(0);
+  const [toInput, setToInput] = useState(0);
+
+  const handleFromChange = (e) => {
+    setFrom(e.target.value);
+  };
+
+  const handleToChange = (e) => {
+    setTo(e.target.value);
+  };
+
+  const fromInputHandler = (e) => {
+    setFromInput(e.target.value);
+    setToInput(e.target.value * data[from]);
+  };
+
+  const toInputHandler = (e) => {
+    setToInput(e.target.value);
+    setFromInput(e.target.value / data[from]);
+  };
+
+  useEffect(() => {
+    getData().then((res) => setData(res));
+  }, []);
+
+  useEffect(() => {
+    data[from] && setToInput(fromInput * data[from]);
+  }, [from]);
+
   return (
     <Container>
       <Title>Конвертер валют</Title>
       <Row>
         <CurrencyBox>
           <CurrencyTitle>Курс USD</CurrencyTitle>
-          <CurrencyValue color="#f28482">29.56</CurrencyValue>
+          {data.USD && <CurrencyValue color="#f28482">{Number(data.USD).toFixed(2)}</CurrencyValue>}
         </CurrencyBox>
         <CurrencyBox>
           <CurrencyTitle>Курс EUR</CurrencyTitle>
-          <CurrencyValue color="#2a9d8f">35.45</CurrencyValue>
+          {data.EUR && <CurrencyValue color="#2a9d8f">{Number(data.EUR).toFixed(2)}</CurrencyValue>}
         </CurrencyBox>
       </Row>
 
       <InputsRow>
         <FormControl>
           <InputLabel>Введіть значення</InputLabel>
-          <BootstrapInput />
+          <BootstrapInput type="number" onChange={fromInputHandler} value={fromInput} />
         </FormControl>
         <FormControl>
           <InputLabel>Валюта</InputLabel>
-          <Select
-            //  value={age}
-            //  onChange={handleChange}
-            input={<BootstrapInput />}
-          >
+          <Select value={from} onChange={handleFromChange} input={<BootstrapInput />}>
             <MenuItem value="USD">USD</MenuItem>
             <MenuItem value="EUR">EUR</MenuItem>
-            <MenuItem value="UA">UA</MenuItem>
           </Select>
         </FormControl>
       </InputsRow>
       <InputsRow>
         <FormControl>
           <InputLabel>Введіть значення</InputLabel>
-          <BootstrapInput />
+          <BootstrapInput type="number" value={toInput} onChange={toInputHandler} />
         </FormControl>
         <FormControl>
           <InputLabel>Валюта</InputLabel>
-          <Select
-            //  value={age}
-            //  onChange={handleChange}
-            input={<BootstrapInput />}
-          >
-            <MenuItem value="USD">USD</MenuItem>
-            <MenuItem value="EUR">EUR</MenuItem>
-            <MenuItem value="UA">UAH</MenuItem>
+          <Select value={to} onChange={handleToChange} input={<BootstrapInput />}>
+            <MenuItem value="UAH">UAH</MenuItem>
           </Select>
         </FormControl>
       </InputsRow>
@@ -164,20 +186,3 @@ const InputsRow = styled.div`
   padding: 0 20px;
   margin-top: 5px;
 `;
-
-
-
-
-// var myHeaders = new Headers();
-// myHeaders.append("apikey", "bJl04wfQwl4HRyFES45d9Z87WoTaqh97");
-
-// var requestOptions = {
-//   method: 'GET',
-//   redirect: 'follow',
-//   headers: myHeaders
-// };
-
-// fetch("https://api.apilayer.com/currency_data/convert?to={to}&from={from}&amount={amount}", requestOptions)
-//   .then(response => response.text())
-//   .then(result => console.log(result))
-//   .catch(error => console.log('error', error));
